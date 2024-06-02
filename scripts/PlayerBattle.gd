@@ -7,8 +7,12 @@ const JUMP_VELOCITY = -250.0
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
+signal health_changed
+
 @onready var animated_sprite_2d = $AnimatedSprite2D
 @onready var animation_player = $AnimatedSprite2D/AnimationPlayer
+
+var health = 100
 
 enum {
 	MOVING,
@@ -27,6 +31,7 @@ func _physics_process(delta):
 			if Input.is_action_just_pressed("jump") and is_on_floor():
 				velocity.y = JUMP_VELOCITY
 			if Input.is_action_just_pressed("attack_light") and is_on_floor():
+				health -= 5
 				state = ATTACKING
 			var direction = Input.get_axis("move_left", "move_right")
 			if direction:
@@ -37,6 +42,7 @@ func _physics_process(delta):
 				animated_sprite_2d.play("idle")
 			move_and_slide()
 		ATTACKING:
+			health_changed.emit()
 			animation_player.play("attack_light")
 
 
